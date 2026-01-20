@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Snake Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐍</text></svg>">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header Section -->
+        <header class="game-header">
+            <h1><i class="fas fa-gamepad"></i> SABELO'S SNAKE</h1>
+            <div class="header-controls">
+                <button id="soundToggle" class="btn-icon" title="Toggle Sound">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <button id="helpBtn" class="btn-icon" title="Help">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="game-content">
+            <!-- Game Stats Panel -->
+            <div class="stats-panel">
+                <div class="stat-box">
+                    <div class="stat-label">SCORE</div>
+                    <div class="stat-value" id="score">0000</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">HIGH SCORE</div>
+                    <div class="stat-value" id="highScore">0000</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">LENGTH</div>
+                    <div class="stat-value" id="length">1</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">SPEED</div>
+                    <div class="stat-value" id="speed">NORMAL</div>
+                </div>
+            </div>
+
+            <!-- Game Canvas -->
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="600" height="600"></canvas>
+                
+                <!-- Game Start Overlay -->
+                <div id="startScreen" class="overlay active">
+                    <div class="overlay-content">
+                        <h2><i class="fas fa-play-circle"></i> READY TO PLAY?</h2>
+                        <div class="difficulty-selector">
+                            <h3>Select Difficulty:</h3>
+                            <div class="difficulty-buttons">
+                                <button class="difficulty-btn active" data-speed="150">EASY</button>
+                                <button class="difficulty-btn" data-speed="100">NORMAL</button>
+                                <button class="difficulty-btn" data-speed="70">HARD</button>
+                                <button class="difficulty-btn" data-speed="40">EXPERT</button>
+                            </div>
+                        </div>
+                        <div class="controls-info">
+                            <h3>Controls:</h3>
+                            <div class="control-methods">
+                                <div class="control-method">
+                                    <h4><i class="fas fa-keyboard"></i> Keyboard</h4>
+                                    <p>Arrow Keys or WASD</p>
+                                </div>
+                                <div class="control-method">
+                                    <h4><i class="fas fa-mobile-alt"></i> Touch Controls</h4>
+                                    <p>Use buttons below</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="startGameBtn" class="btn-primary">
+                            <i class="fas fa-rocket"></i> START GAME
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Game Paused Overlay -->
+                <div id="pauseScreen" class="overlay">
+                    <div class="overlay-content">
+                        <h2><i class="fas fa-pause-circle"></i> GAME PAUSED</h2>
+                        <button id="resumeBtn" class="btn-primary">
+                            <i class="fas fa-play"></i> RESUME
+                        </button>
+                        <button id="restartBtn" class="btn-secondary">
+                            <i class="fas fa-redo"></i> RESTART
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Game Over Overlay -->
+                <div id="gameOverScreen" class="overlay">
+                    <div class="overlay-content">
+                        <h2><i class="fas fa-skull-crossbones"></i> GAME OVER</h2>
+                        <div class="game-over-stats">
+                            <p>Final Score: <span id="finalScore">0</span></p>
+                            <p>Snake Length: <span id="finalLength">0</span></p>
+                            <p>Food Eaten: <span id="foodEaten">0</span></p>
+                        </div>
+                        <button id="playAgainBtn" class="btn-primary">
+                            <i class="fas fa-play-circle"></i> PLAY AGAIN
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <!-- Main Control Buttons -->
+                <div class="control-section">
+                    <h3><i class="fas fa-gamepad"></i> GAME CONTROLS</h3>
+                    <div class="game-controls">
+                        <button id="pauseGameBtn" class="btn-control">
+                            <i class="fas fa-pause"></i> PAUSE
+                        </button>
+                        <button id="newGameBtn" class="btn-control">
+                            <i class="fas fa-plus-circle"></i> NEW GAME
+                        </button>
+                        <button id="resetScoreBtn" class="btn-control">
+                            <i class="fas fa-trash-alt"></i> RESET SCORE
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Directional Controls (for mobile/touch) -->
+                <div class="control-section">
+                    <h3><i class="fas fa-arrows-alt"></i> DIRECTIONAL CONTROLS</h3>
+                    <div class="directional-controls">
+                        <div class="direction-row">
+                            aasd<button class="dir-btn" data-dir="up">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                        </div>
+                        <div class="direction-row">
+                            <button class="dir-btn" data-dir="left">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <div class="center-space"></div>
+                            <button class="dir-btn" data-dir="right">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div class="direction-row">
+                            <button class="dir-btn" data-dir="down">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Speed Controls -->
+                <div class="control-section">
+                    <h3><i class="fas fa-tachometer-alt"></i> SPEED CONTROLS</h3>
+                    <div class="speed-controls">
+                        <button class="speed-btn" data-speed="200">
+                            <i class="fas fa-turtle"></i> SLOW
+                        </button>
+                        <button class="speed-btn active" data-speed="100">
+                            <i class="fas fa-walking"></i> NORMAL
+                        </button>
+                        <button class="speed-btn" data-speed="70">
+                            <i class="fas fa-running"></i> FAST
+                        </button>
+                        <button class="speed-btn" data-speed="40">
+                            <i class="fas fa-bolt"></i> INSANE
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Keyboard Shortcuts Info -->
+                <div class="control-section">
+                    <h3><i class="fas fa-keyboard"></i> KEYBOARD SHORTCUTS</h3>
+                    <div class="shortcuts">
+                        <div class="shortcut-item">
+                            <kbd>↑ ↓ ← →</kbd> or <kbd>WASD</kbd>
+                            <span>Move Snake</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>SPACE</kbd> or <kbd>P</kbd>
+                            <span>Pause/Resume</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>R</kbd>
+                            <span>Restart Game</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>ESC</kbd>
+                            <span>Main Menu</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>M</kbd>
+                            <span>Toggle Sound</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="game-footer">
+            <div class="footer-content">
+                <p>Use <strong>Keyboard Arrows</strong> or <strong>WASD</strong> or <strong>Touch Controls</strong> to play</p>
+                <p class="hint">Pro Tip: Try to collect multiple foods without growing too long!</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-info-circle"></i> HOW TO PLAY</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-section">
+                    <h3><i class="fas fa-bullseye"></i> Objective</h3>
+                    <p>Control the snake to eat food (red squares) and grow as long as possible without hitting walls or yourself.</p>
+                </div>
+                <div class="help-section">
+                    <h3><i class="fas fa-gamepad"></i> Controls</h3>
+                    <div class="control-grid">
+                        <div>
+                            <h4>Keyboard:</h4>
+                            <ul>
+                                <li><strong>Arrow Keys</strong> or <strong>WASD</strong>: Move snake</li>
+                                <li><strong>SPACE</strong> or <strong>P</strong>: Pause/Resume</li>
+                                <li><strong>R</strong>: Restart game</li>
+                                <li><strong>ESC</strong>: Return to menu</li>
+                                <li><strong>M</strong>: Toggle sound</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Touch/Mouse:</h4>
+                            <ul>
+                                <li>Use directional buttons</li>
+                                <li>Game control buttons</li>
+                                <li>Speed adjustment buttons</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="help-section">
+                    <h3><i class="fas fa-chart-line"></i> Scoring</h3>
+                    <ul>
+                        <li>Each food: <strong>10 points</strong></li>
+                        <li>Every 5 foods: <strong>Speed increases</strong></li>
+                        <li>High score is saved automatically</li>
+                    </ul>
+                </div>
+                <div class="help-section">
+                    <h3><i class="fas fa-lightbulb"></i> Tips</h3>
+                    <ul>
+                        <li>Plan your path ahead</li>
+                        <li>Don't trap yourself in corners</li>
+                        <li>Use the whole playing field</li>
+                        <li>Start with Easy mode if you're new</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="eatSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="gameOverSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-retro-arcade-game-over-470.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="moveSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
